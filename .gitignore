@@ -10,6 +10,9 @@ DerivedData/
 include/
 lib/
 
+# assets
+assets/
+
 ## Various settings
 *.pbxuser
 !default.pbxuser
