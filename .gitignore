@@ -6,6 +6,10 @@
 build/
 DerivedData/
 
+## lib && header files
+include/
+lib/
+
 ## Various settings
 *.pbxuser
 !default.pbxuser
