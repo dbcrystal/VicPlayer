@@ -75,6 +75,8 @@ NSString * const KxMovieParameterDisableDeinterlacing = @"KxMovieParameterDisabl
         
         _parameters = param;
         
+        [audioManager activateAudioSession];
+        
     }
     return self;
 }
@@ -344,8 +346,7 @@ NSString * const KxMovieParameterDisableDeinterlacing = @"KxMovieParameterDisabl
             [self asyncDecodeFrames];
         }
         
-        const NSTimeInterval correction = [self tickCorrection];
-        const NSTimeInterval time = MAX(interval + correction, 0.01);
+        const NSTimeInterval time = 1/self.decoder.fps;//MAX(interval + correction, 0.01);
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, time * NSEC_PER_SEC);
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
             [self tick];

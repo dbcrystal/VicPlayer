@@ -205,7 +205,7 @@
 			children = (
 				1C7F66591F287F0D002D22B0 /* VicPlayer */,
 				1C7F66731F287F0D002D22B0 /* VicPlayerTests */,
-				1C7F667E1F287F0D002D22B0 /* test_for_flvUITests */,
+				1C7F667E1F287F0D002D22B0 /* VicPlayerUITests */,
 				1C7F66581F287F0D002D22B0 /* Products */,
 				1C7F668D1F28892F002D22B0 /* Frameworks */,
 			);
@@ -256,13 +256,13 @@
 			path = VicPlayerTests;
 			sourceTree = "<group>";
 		};
-		1C7F667E1F287F0D002D22B0 /* test_for_flvUITests */ = {
+		1C7F667E1F287F0D002D22B0 /* VicPlayerUITests */ = {
 			isa = PBXGroup;
 			children = (
 				1C7F667F1F287F0D002D22B0 /* VicPlayerUITests.m */,
 				1C7F66811F287F0D002D22B0 /* Info.plist */,
 			);
-			path = test_for_flvUITests;
+			path = VicPlayerUITests;
 			sourceTree = "<group>";
 		};
 		1C7F668D1F28892F002D22B0 /* Frameworks */ = {

@@ -261,7 +261,8 @@ static void FFLog(void* context, int level, const char* format, va_list args);
     _videoCodecParam = videoCodecParam;
     
     // TODO: 设置FPS
-//    AVStream *stream = _context->streams[_videoStream];
+    AVStream *stream = _context->streams[_videoStream];
+    self.fps = stream->avg_frame_rate.num/stream->avg_frame_rate.den;
     
     return RTMPDecoderErrorNone;
 }
@@ -840,7 +841,8 @@ static void FFLog(void* context, int level, const char* format, va_list args);
 - (BOOL)checkIfAudioCodecIsSupported:(AVCodecContext *)audioCodecContext {
     
     if (audioCodecContext->sample_fmt == AV_SAMPLE_FMT_S16) {
-        return YES;
+        
+        return (int)audioManager.samplingRate == audioCodecContext->sample_rate && audioManager.numOutputChannels == audioCodecContext->channels;
     } else {
         return NO;
     }
@@ -879,9 +881,11 @@ static void FFLog(void* context, int level, const char* format, va_list args);
 #pragma mark - streaming
 - (NSArray *)collectStreamsWithContext:(AVFormatContext *)formatContext andCType:(enum AVMediaType)codecType {
     NSMutableArray *arr = [NSMutableArray array];
-    for (NSInteger i = 0; i < formatContext->nb_streams; ++i)
-        if (codecType == formatContext->streams[i]->codecpar->codec_type)
+    for (NSInteger i = 0; i < formatContext->nb_streams; ++i) {
+        if (codecType == formatContext->streams[i]->codecpar->codec_type) {
             [arr addObject: [NSNumber numberWithInteger: i]];
+        }
+    }
     return [arr copy];
 }
 
