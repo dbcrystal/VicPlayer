@@ -10,7 +10,7 @@
 
 @implementation RTMPSubtitleFrame
 
-- (EnumRTMPFrameType)type {
+- (EnumRTMPFrameType)enumFrameType {
     return EnumRTMPFrameTypeSubtitle;
 }
 

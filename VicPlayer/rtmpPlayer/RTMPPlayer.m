@@ -75,7 +75,7 @@ NSString * const KxMovieParameterDisableDeinterlacing = @"KxMovieParameterDisabl
         
         _parameters = param;
         
-        [audioManager activateAudioSession];
+//        [audioManager activateAudioSession];
         
     }
     return self;
@@ -484,7 +484,7 @@ NSString * const KxMovieParameterDisableDeinterlacing = @"KxMovieParameterDisabl
         
         audioManager.outputBlock = ^(float *outData, UInt32 numFrames, UInt32 numChannels) {
             
-            [self audioCallbackFillData: outData numFrames:numFrames numChannels:numChannels];
+            [self audioCallbackFillData:outData numFrames:numFrames numChannels:numChannels];
         };
         
         [audioManager play];

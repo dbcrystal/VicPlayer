@@ -307,9 +307,9 @@ static void FFLog(void* context, int level, const char* format, va_list args);
     if (![self checkIfAudioCodecIsSupported:_audioCodecContext]) {
         
         swrContext = swr_alloc_set_opts(NULL,
-                                        av_get_default_channel_layout(audioManager.numOutputChannels),
+                                        av_get_default_channel_layout(2),//audioManager.numOutputChannels),
                                         AV_SAMPLE_FMT_S16,
-                                        audioManager.samplingRate,
+                                        audioCodecParam->sample_rate,//audioManager.samplingRate,
                                         av_get_default_channel_layout(_audioCodecContext->channels),
                                         _audioCodecContext->sample_fmt,
                                         _audioCodecContext->sample_rate,
@@ -318,8 +318,9 @@ static void FFLog(void* context, int level, const char* format, va_list args);
         
         if (!swrContext || swr_init(swrContext)) {
             
-            if (swrContext)
+            if (swrContext) {
                 swr_free(&swrContext);
+            }
             avcodec_close(_audioCodecContext);
             
             return RTMPDecoderErrorReSampler;

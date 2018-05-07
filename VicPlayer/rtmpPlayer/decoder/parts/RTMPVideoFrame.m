@@ -10,7 +10,7 @@
 
 @implementation RTMPVideoFrame
 
-- (EnumRTMPFrameType)type {
+- (EnumRTMPFrameType)enumFrameType {
     return EnumRTMPFrameTypeVideo;
 }
 
@@ -18,7 +18,7 @@
 
 @implementation RTMPVideoFrameYUV
 
-- (EnumRTMPVideoFrameType)format {
+- (EnumRTMPVideoFrameType)enumVideoFrameType {
     return EnumRTMPVideoFrameTypeYUV;
 }
 
@@ -26,7 +26,7 @@
 
 @implementation RTMPVideoFrameRGB
 
-- (EnumRTMPVideoFrameType)format {
+- (EnumRTMPVideoFrameType)enumVideoFrameType {
     return EnumRTMPVideoFrameTypeRGB;
 }
 

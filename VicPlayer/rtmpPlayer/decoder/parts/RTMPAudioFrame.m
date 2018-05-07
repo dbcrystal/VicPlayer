@@ -10,7 +10,7 @@
 
 @implementation RTMPAudioFrame
 
-- (EnumRTMPFrameType)type {
+- (EnumRTMPFrameType)enumFrameType {
     return EnumRTMPFrameTypeAudio;
 }
 

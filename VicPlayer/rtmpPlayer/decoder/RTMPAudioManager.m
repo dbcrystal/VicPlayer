@@ -7,6 +7,7 @@
 //
 
 #import "RTMPAudioManager.h"
+#import <AVFoundation/AVFoundation.h>
 
 #define MAX_FRAME_SIZE 4096
 #define MAX_CHAN       2
@@ -16,6 +17,13 @@
 @property (nonatomic, assign, getter=isAudioSessionActivated) BOOL audioSessionActivate;
 
 @property (nonatomic, assign) AudioUnit audioUnit;
+
+@property unsigned int numOutputChannels;
+@property double samplingRate;
+@property unsigned int numBytesPerSample;
+@property float outputVolume;
+@property BOOL playing;
+@property (nonatomic, strong) NSString *audioRoute;
 
 @end
 
@@ -39,12 +47,14 @@
         
         _outputData = (float *)calloc(MAX_FRAME_SIZE*MAX_CHAN, sizeof(float));
         _outputVolume = 0.5;
+        
+        [self activateAudioSession];
     }
     return self;
 }
 
 #pragma mark - activate
-- (NSError *)activateAudioSession {
+- (BOOL)activateAudioSession {
     
     NSError *error;
     
@@ -52,19 +62,44 @@
                                      withOptions:AVAudioSessionCategoryOptionMixWithOthers
                                            error:&error];
     
+    if (error) {
+        return NO;
+    }
+    
     [[AVAudioSession sharedInstance] setActive:YES
                                    withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
                                          error:&error];
+    
+    if (error) {
+        return NO;
+    }
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(audioManagerHandleInterruption:)
                                                  name:AVAudioSessionInterruptionNotification
                                                object:[AVAudioSession sharedInstance]];
     
-    return error;
+    if ([self checkIfAudioSessionIsReady] && [self setupAudioUnit]) {
+        self.audioSessionActivate = YES;
+    }
+    
+    if (error) {
+        return NO;
+    } else {
+        return YES;
+    }
 }
 
-- (void)setupAudioUnit {
+- (BOOL)setupAudioUnit {
+    
+//    UInt32 propertySize = sizeof(CFStringRef);
+//    CFStringRef route;
+    
+    if (![[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil]) {
+        return NO;
+    }
+    
+    [self chectAudioSessionProperty];
     
     AudioComponentDescription description = {0};
     description.componentType = kAudioUnitType_Output;
@@ -90,18 +125,42 @@
                          &_outputFormat,
                          size);
     
+    _numBytesPerSample = _outputFormat.mBitsPerChannel / 8;
+    _numOutputChannels = _outputFormat.mChannelsPerFrame;
+    
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProc = renderCallback;
     callbackStruct.inputProcRefCon = (__bridge void *)(self);
     
     AudioUnitSetProperty(_audioUnit,
-                                        kAudioUnitProperty_SetRenderCallback,
-                                        kAudioUnitScope_Input,
-                                        0,
-                                        &callbackStruct,
+                         kAudioUnitProperty_SetRenderCallback,
+                         kAudioUnitScope_Input,
+                         0,
+                         &callbackStruct,
                          sizeof(callbackStruct));
     
     AudioUnitInitialize(_audioUnit);
+    
+    return YES;
+}
+
+- (void)chectAudioSessionProperty {
+    
+    NSError *error;
+//    [[AVAudioSession sharedInstance] currentRoute];
+    
+    self.samplingRate = 44100.f;
+    [[AVAudioSession sharedInstance] setPreferredSampleRate:self.samplingRate error:&error];
+    
+    if (error) {
+        NSLog(@"set Audio Session sample Rate encountered error:%@", error);
+    }
+    
+    [[AVAudioSession sharedInstance] setPreferredOutputNumberOfChannels:2 error:&error];
+    
+    if (error) {
+        NSLog(@"set Audio Session output channel number encountered error:%@", error);
+    }
 }
 
 #pragma mark - deactivate
@@ -127,9 +186,14 @@
 #pragma mark - play
 - (BOOL)play {
     
-    OSStatus error = AudioOutputUnitStart(_audioUnit);
+    if (!_playing) {
+        if ([self activateAudioSession]) {
+            
+            _playing = ![self checkError:AudioOutputUnitStart(_audioUnit)];
+        }
+    }
     
-    return [self checkError:error];
+    return _playing;
 }
 
 #pragma mark - stop
@@ -139,7 +203,7 @@
 
 #pragma mark - 检查audioSession是否可以播放
 - (BOOL)checkIfAudioSessionIsReady {
-    if ([[AVAudioSession sharedInstance] isOtherAudioPlaying]) {
+    if ([[AVAudioSession sharedInstance] secondaryAudioShouldBeSilencedHint]) {
         return NO;
     } else {
         return YES;

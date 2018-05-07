@@ -10,7 +10,7 @@
 
 @implementation RTMPArtworkFrame
 
-- (EnumRTMPFrameType)type {
+- (EnumRTMPFrameType)enumFrameType {
     return EnumRTMPFrameTypeArtwork;
 }
 

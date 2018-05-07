@@ -33,7 +33,7 @@ typedef void (^KxAudioManagerOutputBlock)(float *data, UInt32 numFrames, UInt32 
 
 @property (readwrite, copy) KxAudioManagerOutputBlock outputBlock;
 
-- (NSError *)activateAudioSession;
+- (BOOL)activateAudioSession;
 - (NSError *)deactivateAudioSession;
 - (BOOL)play;
 - (void)stop;
